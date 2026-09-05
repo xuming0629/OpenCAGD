@@ -1,0 +1,69 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "debug",
+      "displayName": "OpenCAGD Debug (Mac learning)",
+      "description": "C++20 Debug build with bundled MPI/GTest and optional active-Python Matplotlib",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "OPENCAGD_BUILD_EXAMPLES": "ON",
+        "OPENCAGD_BUILD_TESTS": "ON",
+        "OPENCAGD_ENABLE_MPI": "ON",
+        "OPENCAGD_ENABLE_PYTHON_PLOTTING": "ON",
+        "OPENCAGD_USE_BUNDLED_DEPS": "ON",
+        "CMAKE_OSX_ARCHITECTURES": "arm64"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "OpenCAGD Release (Mac)",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "OPENCAGD_BUILD_EXAMPLES": "ON",
+        "OPENCAGD_BUILD_TESTS": "ON",
+        "OPENCAGD_ENABLE_MPI": "ON",
+        "OPENCAGD_ENABLE_PYTHON_PLOTTING": "ON",
+        "OPENCAGD_USE_BUNDLED_DEPS": "ON",
+        "CMAKE_OSX_ARCHITECTURES": "arm64"
+      }
+    },
+    {
+      "name": "core-debug",
+      "displayName": "OpenCAGD Core Debug (portable)",
+      "description": "Portable learning build without MPI or bundled binary dependencies",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/core-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "OPENCAGD_BUILD_EXAMPLES": "ON",
+        "OPENCAGD_BUILD_TESTS": "ON",
+        "OPENCAGD_ENABLE_MPI": "OFF",
+        "OPENCAGD_ENABLE_PYTHON_PLOTTING": "ON",
+        "OPENCAGD_USE_BUNDLED_DEPS": "OFF"
+      }
+    }
+  ],
+  "buildPresets": [
+    {"name": "debug", "configurePreset": "debug"},
+    {"name": "release", "configurePreset": "release"},
+    {"name": "core-debug", "configurePreset": "core-debug"}
+  ],
+  "testPresets": [
+    {"name": "debug", "configurePreset": "debug", "output": {"outputOnFailure": true}},
+    {"name": "release", "configurePreset": "release", "output": {"outputOnFailure": true}},
+    {"name": "core-debug", "configurePreset": "core-debug", "output": {"outputOnFailure": true}}
+  ]
+}

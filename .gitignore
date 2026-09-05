@@ -1,0 +1,26 @@
+# Build output
+/build/
+/cmake-build-*/
+
+# CMake local/user files
+CMakeUserPresets.json
+
+# Compiled objects / libraries
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Editor / OS noise
+.DS_Store
+.idea/
+
+# Keep repository VS Code configuration
+!.vscode/
+!.vscode/*.json
+
+# Vendored third-party runtime packages are intentionally versioned.
+!third_party/**

@@ -1,0 +1,19 @@
+function(opencagd_add_learning_example target source)
+    add_executable(${target} ${source})
+    target_link_libraries(${target} PRIVATE OpenCAGD::OpenCAGD)
+endfunction()
+
+opencagd_add_learning_example(opencagd_ch01_power_basis ch01_foundations/00_power_basis.cpp)
+opencagd_add_learning_example(opencagd_ch01_polynomial_curve ch01_foundations/01_polynomial_curve.cpp)
+
+opencagd_add_learning_example(opencagd_ch02_bernstein ch02_bezier/00_bernstein_basis.cpp)
+opencagd_add_learning_example(opencagd_ch02_bezier ch02_bezier/01_bezier_curve.cpp)
+opencagd_add_learning_example(opencagd_ch02_de_casteljau ch02_bezier/02_de_casteljau.cpp)
+opencagd_add_learning_example(opencagd_ch02_bezier_power ch02_bezier/03_bezier_power_conversion.cpp)
+
+opencagd_add_learning_example(opencagd_ch03_find_span ch03_bspline/00_find_span.cpp)
+opencagd_add_learning_example(opencagd_ch03_bspline_basis ch03_bspline/01_bspline_basis.cpp)
+opencagd_add_learning_example(opencagd_ch03_bspline_curve ch03_bspline/02_bspline_curve.cpp)
+
+opencagd_add_learning_example(opencagd_ch04_nurbs_circle ch04_nurbs/00_quarter_circle.cpp)
+opencagd_add_learning_example(opencagd_ch04_rational_basis ch04_nurbs/01_rational_basis.cpp)

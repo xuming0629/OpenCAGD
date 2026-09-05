@@ -1,0 +1,29 @@
+{
+    "cmake.useCMakePresets": "always",
+    "cmake.configureOnOpen": true,
+    "cmake.defaultConfigurePreset": "debug",
+    "cmake.buildBeforeRun": true,
+    "cmake.debugConfig": {
+        "MIMode": "lldb",
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [
+            {
+                "name": "PATH",
+                "value": "${workspaceFolder}/third_party/openmpi/bin:${env:PATH}"
+            },
+            {
+                "name": "DYLD_LIBRARY_PATH",
+                "value": "${workspaceFolder}/third_party/openmpi/lib:${env:DYLD_LIBRARY_PATH}"
+            },
+            {
+                "name": "OPAL_PREFIX",
+                "value": "${workspaceFolder}/third_party/openmpi"
+            }
+        ]
+    },
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/build/debug/compile_commands.json",
+    "files.associations": {
+        "*.hpp": "cpp"
+    }
+}

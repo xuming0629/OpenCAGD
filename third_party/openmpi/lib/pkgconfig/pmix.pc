@@ -1,0 +1,14 @@
+prefix=/Users/xuming/software/mpi-5.0/install
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: pmix
+Description: Process Management Interface for Exascale (PMIx)
+Version: 5.0.10
+URL: https://pmix.org/
+Libs: -L${libdir} -lpmix -levent_core -levent_pthreads
+Libs.private: 
+Cflags: -I${includedir} -I${includedir}/pmix
+Requires: 
+Requires.private: 
