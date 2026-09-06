@@ -19,16 +19,22 @@ Knot Vector ── FindSpan
           ↓
 B-Spline Basis / BasisFuns
           ↓
-B-Spline Curve
+DersBasisFuns / Curve Derivatives
           ↓
-Rational Basis
+B-Spline Curve Differential Geometry
           ↓
-NURBS Curve
+Rational Basis / NURBS Curve
           ↓
-精确圆锥曲线 / Surface / CAD Algorithms
+NURBS Derivatives / Tangent / Curvature
+          ↓
+Tensor-product Surface
+          ↓
+Surface Partials / Normal / Curvature
+          ↓
+Knot Insertion / Refinement / CAD Algorithms
 ```
 
-已经实现到 **NURBS 曲线 + 二次 NURBS 精确 1/4 圆**。
+已经实现到 **B-Spline/NURBS 曲线微分几何 + Bézier/B-Spline/NURBS 曲面微分几何**。
 
 ## 为什么这样组织
 
@@ -69,8 +75,15 @@ examples/visualization/
 - `FindSpan`；
 - iterative `BasisFuns`；
 - B-Spline curve；
+- `DersBasisFuns`（The NURBS Book Algorithm A2.3）；
+- B-Spline curve derivatives / tangent / curvature；
 - NURBS curve；
+- NURBS rational derivatives / tangent / curvature；
 - exact quadratic NURBS quarter circle；
+- tensor-product Bezier / B-Spline / NURBS surfaces；
+- exact surface partial derivatives；
+- surface normal / first & second fundamental forms；
+- Gaussian / mean / principal curvatures；
 - optional C++ → embedded CPython → Matplotlib plotting；
 - optional MPI layer；
 - GoogleTest regression tests。
@@ -129,7 +142,12 @@ ctest --preset debug --output-on-failure
 ./build/debug/bin/opencagd_ch03_find_span
 ./build/debug/bin/opencagd_ch03_bspline_basis
 ./build/debug/bin/opencagd_ch03_bspline_curve
+./build/debug/bin/opencagd_ch03_basis_derivatives
+./build/debug/bin/opencagd_ch03_curve_derivatives
 ./build/debug/bin/opencagd_ch04_nurbs_circle
+./build/debug/bin/opencagd_ch04_nurbs_derivatives
+./build/debug/bin/opencagd_ch05_surface_derivatives
+./build/debug/bin/opencagd_ch05_nurbs_cylinder_geometry
 ```
 
 ## C++ 调用 Python Matplotlib
@@ -177,12 +195,6 @@ mkdir -p outputs
 当前最合适的下一组算法不是直接做 Surface，而是继续完成 B-Spline/NURBS 曲线核心：
 
 ```text
-DersBasisFuns
-    ↓
-B-Spline Curve Derivatives
-    ↓
-NURBS Curve Derivatives
-    ↓
 Knot Insertion
     ↓
 Knot Refinement

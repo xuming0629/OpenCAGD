@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <opencagd/curve/bspline_basis.hpp>
+#include <opencagd/curve/bspline_derivatives.hpp>
 #include <opencagd/geometry/point.hpp>
 
 namespace opencagd::surface
@@ -53,6 +54,55 @@ public:
             for (std::size_t b = 0; b <= degree_v(); ++b)
                 point += control_points_[first_u + a][first_v + b] * (Nu[a] * Nv[b]);
         return point;
+    }
+
+    /**
+     * @brief 计算 B-spline 曲面的混合偏导。
+     *
+     *      S^(k,l)(u,v)
+     *        = Σ Σ N_i,p^(k)(u) M_j,q^(l)(v) P_ij
+     */
+    [[nodiscard]]
+    point_type derivative(
+        double u,
+        double v,
+        std::size_t order_u,
+        std::size_t order_v) const
+    {
+        const auto span_u = knot_u_.find_span(u);
+        const auto span_v = knot_v_.find_span(v);
+
+        const auto Nu = curve::basis_function_derivatives(
+            knot_u_, span_u, u, order_u);
+        const auto Nv = curve::basis_function_derivatives(
+            knot_v_, span_v, v, order_v);
+
+        const auto first_u = span_u - degree_u();
+        const auto first_v = span_v - degree_v();
+
+        point_type result{};
+
+        for (std::size_t a = 0; a <= degree_u(); ++a)
+        {
+            for (std::size_t b = 0; b <= degree_v(); ++b)
+            {
+                result +=
+                    control_points_[first_u + a][first_v + b] *
+                    (Nu[order_u][a] * Nv[order_v][b]);
+            }
+        }
+
+        return result;
+    }
+
+    [[nodiscard]] point_type partial_u(double u, double v) const
+    {
+        return derivative(u, v, 1, 0);
+    }
+
+    [[nodiscard]] point_type partial_v(double u, double v) const
+    {
+        return derivative(u, v, 0, 1);
     }
 
 private:

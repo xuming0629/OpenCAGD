@@ -61,3 +61,35 @@ x^2+y^2=1.
 - `examples/book/ch04_nurbs/00_quarter_circle.cpp`
 - `tests/curve/test_nurbs.cpp`
 - `examples/visualization/03_plot_nurbs_circle.cpp`
+
+## 4. NURBS 有理曲线导数
+
+把 NURBS 写成：
+
+\[
+\mathbf C(u)=\frac{\mathbf A(u)}{W(u)},
+\]
+
+其中：
+
+\[
+\mathbf A(u)=\sum_iN_{i,p}(u)w_i\mathbf P_i,
+\qquad
+W(u)=\sum_iN_{i,p}(u)w_i.
+\]
+
+OpenCAGD 先计算 \(A^{(k)}\)、\(W^{(k)}\)，再使用乘积求导关系递推得到有理曲线导数。
+
+```cpp
+auto ders = curve.derivatives(u, 2);
+auto tangent = curve.tangent(u);
+double kappa = curve.curvature(u);
+```
+
+对于单位 NURBS 四分之一圆，任意正则参数位置都应满足：
+
+\[
+\kappa=1.
+\]
+
+这已经作为示例和回归测试加入工程。

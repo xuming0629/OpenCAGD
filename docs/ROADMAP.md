@@ -7,7 +7,7 @@ OpenCAGD 同时有两个目标：
 
 详细学习进度见 `docs/book/STUDY_CHECKLIST.md`。
 
-## Phase 1 — Curve foundation（当前）
+## Phase 1 — Curve foundation（已完成）
 
 - Point arithmetic / numeric helpers
 - Power basis / polynomial curve
@@ -19,21 +19,25 @@ OpenCAGD 同时有两个目标：
 - exact NURBS quarter circle
 - C++ embedded Python + Matplotlib
 
-## Phase 2 — Core NURBS algorithms
+## Phase 2 — Differential geometry（已完成）
 
-- DersBasisFuns
-- B-Spline / NURBS derivatives
-- knot insertion / refinement / removal
+- `DersBasisFuns` / Algorithm A2.3
+- B-Spline curve derivatives
+- NURBS rational curve derivatives
+- unit tangent / curve curvature
+- Bezier / B-Spline / NURBS surface derivatives
+- surface normal
+- first / second fundamental forms
+- Gaussian / mean / principal curvatures
+
+## Phase 3 — Core CAD refinement algorithms（下一步）
+
+- knot multiplicity
+- knot insertion
+- knot refinement / removal
 - Bezier decomposition
 - degree elevation
 - interpolation / approximation
-
-## Phase 3 — Tensor-product surfaces
-
-- Bezier surface
-- B-Spline surface
-- NURBS surface
-- partial derivatives / normals / curvature
 
 ## Phase 4 — Geometry algorithms
 

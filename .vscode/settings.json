@@ -1,8 +1,11 @@
 {
+    "cmake.cmakePath": "/Applications/CMake.app/Contents/bin/cmake",
+
     "cmake.useCMakePresets": "always",
     "cmake.configureOnOpen": true,
     "cmake.defaultConfigurePreset": "debug",
     "cmake.buildBeforeRun": true,
+
     "cmake.debugConfig": {
         "MIMode": "lldb",
         "stopAtEntry": false,
@@ -22,7 +25,11 @@
             }
         ]
     },
+
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+
     "C_Cpp.default.compileCommands": "${workspaceFolder}/build/debug/compile_commands.json",
+
     "files.associations": {
         "*.hpp": "cpp"
     }

@@ -126,6 +126,24 @@ template <typename T, std::size_t Dim>
     return result;
 }
 
+/**
+ * @brief 三维向量叉积。
+ *
+ * Point 在 OpenCAGD 当前学习阶段同时承担点和自由向量的线性代数表示，
+ * 因而叉积返回 Point<T,3>。
+ */
+template <typename T>
+[[nodiscard]] constexpr Point<T, 3> cross(
+    const Point<T, 3>& a,
+    const Point<T, 3>& b) noexcept
+{
+    return Point<T, 3>{
+        a[1] * b[2] - a[2] * b[1],
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0]
+    };
+}
+
 using Point2d = Point<double, 2>;
 using Point3d = Point<double, 3>;
 using Point4d = Point<double, 4>;

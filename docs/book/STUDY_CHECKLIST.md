@@ -5,7 +5,8 @@
 - [x] Point / 向量线性组合
 - [x] 幂基
 - [x] 向量值多项式曲线
-- [ ] 参数曲线一阶/二阶导数与 Frenet 几何
+- [x] 参数曲线一阶/二阶导数、单位切向与曲率
+- [ ] 完整 Frenet frame / torsion
 
 ## B. Bezier
 
@@ -25,8 +26,8 @@
 - [x] FindSpan
 - [x] BasisFuns
 - [x] B-Spline 曲线
-- [ ] DersBasisFuns
-- [ ] 曲线导数
+- [x] DersBasisFuns
+- [x] 曲线导数
 - [ ] 节点插入
 - [ ] 节点细化
 - [ ] Bezier 分解
@@ -38,16 +39,16 @@
 - [x] 二次 NURBS 精确圆弧
 - [ ] 齐次坐标实现
 - [x] Rational basis 显式 API
-- [ ] NURBS 导数
+- [x] NURBS 导数
 - [ ] 完整圆 / 椭圆 / 圆锥曲线
 
 ## E. Surface
 
-- [ ] Bezier surface
-- [ ] B-Spline surface
-- [ ] NURBS surface
-- [ ] 偏导数 / 法向
-- [ ] 曲率
+- [x] Bezier surface
+- [x] B-Spline surface
+- [x] NURBS surface
+- [x] 偏导数 / 法向
+- [x] Gaussian / Mean / Principal 曲率
 
 ## F. 几何算法
 

@@ -67,3 +67,50 @@ N_{i,p}(u)=
 - `include/opencagd/curve/bspline_curve.hpp`
 - `examples/book/ch03_bspline/`
 - `tests/curve/test_bspline.cpp`
+
+## 4. DersBasisFuns：基函数导数
+
+OpenCAGD 现在实现了《The NURBS Book》Algorithm A2.3：`DersBasisFuns`：
+
+```cpp
+auto ders = basis_function_derivatives(knots, span, u, 2);
+```
+
+其中：
+
+```text
+ders[0][j] = N_j,p(u)
+ders[1][j] = N'_j,p(u)
+ders[2][j] = N''_j,p(u)
+```
+
+单位分解求导后给出非常重要的验证恒等式：
+
+\[
+\sum_i N_{i,p}(u)=1,
+\qquad
+\sum_i N'_{i,p}(u)=0,
+\qquad
+\sum_i N''_{i,p}(u)=0.
+\]
+
+## 5. B-Spline 曲线导数、切线与曲率
+
+\[
+\mathbf C^{(k)}(u)=\sum_iN_{i,p}^{(k)}(u)\mathbf P_i.
+\]
+
+对应：
+
+```cpp
+auto ders = curve.derivatives(u, 2);
+auto d1 = curve.derivative(u, 1);
+auto T = curve.tangent(u);
+double kappa = curve.curvature(u);
+```
+
+二维和三维曲线统一使用 Gram determinant 形式计算曲率：
+
+\[
+\kappa=\frac{\sqrt{\|C'\|^2\|C''\|^2-(C'\cdot C'')^2}}{\|C'\|^3}.
+\]
