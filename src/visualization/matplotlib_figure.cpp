@@ -61,12 +61,49 @@ void MatplotlibFigure::add_curve_3d(const std::vector<Point3d>& points, const st
           << ",linewidth=1.8,label=" << py_string(label) << ")\n";
 }
 
+void MatplotlibFigure::add_vectors_3d(
+    const std::vector<Point3d>& origins,
+    const std::vector<Point3d>& vectors,
+    double length,
+    const std::string& label)
+{
+    require_mode(AxisMode::ThreeD);
+    if (origins.empty()) return;
+    if (origins.size() != vectors.size())
+        throw std::invalid_argument("3D vector origins and vectors must have the same size");
+
+    body_ << "ax.quiver("
+          << axis_values(origins,0) << ',' << axis_values(origins,1) << ',' << axis_values(origins,2) << ','
+          << axis_values(vectors,0) << ',' << axis_values(vectors,1) << ',' << axis_values(vectors,2)
+          << ",length=" << length << ",normalize=True,label=" << py_string(label) << ")\n";
+}
+
 void MatplotlibFigure::add_control_polygon(const std::vector<Point2d>& points, const std::string& label)
 {
     require_mode(AxisMode::TwoD);
     if (points.empty()) return;
     body_ << "plt.plot(" << axis_values(points,0) << ',' << axis_values(points,1)
           << ",'--o',linewidth=1.0,markersize=5,label=" << py_string(label) << ")\n";
+}
+
+void MatplotlibFigure::add_vectors_2d(
+    const std::vector<Point2d>& origins,
+    const std::vector<Point2d>& vectors,
+    double scale,
+    const std::string& label)
+{
+    require_mode(AxisMode::TwoD);
+    if (origins.empty()) return;
+    if (origins.size() != vectors.size())
+        throw std::invalid_argument("2D vector origins and vectors must have the same size");
+
+    std::vector<Point2d> scaled = vectors;
+    for (auto& vector : scaled) vector *= scale;
+
+    body_ << "plt.quiver("
+          << axis_values(origins,0) << ',' << axis_values(origins,1) << ','
+          << axis_values(scaled,0) << ',' << axis_values(scaled,1)
+          << ",angles='xy',scale_units='xy',scale=1,label=" << py_string(label) << ")\n";
 }
 
 void MatplotlibFigure::add_surface(const surface::SurfaceSampleGrid<Point3d>& grid, const std::string&)

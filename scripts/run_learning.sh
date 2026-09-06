@@ -13,7 +13,12 @@ BIN="${ROOT_DIR}/build/${PRESET}/bin"
 "${BIN}/opencagd_ch02_bernstein"
 "${BIN}/opencagd_ch02_de_casteljau"
 "${BIN}/opencagd_ch03_bspline_basis"
+"${BIN}/opencagd_ch03_basis_derivatives"
+"${BIN}/opencagd_ch03_curve_derivatives"
 "${BIN}/opencagd_ch04_nurbs_circle"
+"${BIN}/opencagd_ch04_nurbs_derivatives"
+"${BIN}/opencagd_ch05_surface_derivatives"
+"${BIN}/opencagd_ch05_nurbs_cylinder_geometry"
 
 if [[ -x "${BIN}/opencagd_plot_nurbs_circle" ]]; then
   mkdir -p outputs

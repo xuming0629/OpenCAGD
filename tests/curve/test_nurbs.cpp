@@ -36,3 +36,21 @@ TEST(OpenCAGDNURBS, RationalBasisIsPartitionOfUnity)
         EXPECT_NEAR(sum, 1.0, 1.0e-12);
     }
 }
+
+
+TEST(OpenCAGDNURBSDerivatives, QuarterCircleCurvatureIsOne)
+{
+    const double w = std::sqrt(2.0) / 2.0;
+    const opencagd::curve::NURBSCurve2d curve(
+        2,
+        {0.0, 0.0, 0.0, 1.0, 1.0, 1.0},
+        {{1.0, 0.0}, {1.0, 1.0}, {0.0, 1.0}},
+        {1.0, w, 1.0});
+
+    for (double u : {0.1, 0.25, 0.5, 0.75, 0.9})
+    {
+        const auto tangent = curve.tangent(u);
+        EXPECT_NEAR(tangent.norm(), 1.0, 1.0e-12);
+        EXPECT_NEAR(curve.curvature(u), 1.0, 2.0e-12);
+    }
+}

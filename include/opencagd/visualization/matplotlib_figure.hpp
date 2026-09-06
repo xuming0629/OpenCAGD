@@ -21,8 +21,16 @@ public:
                       const std::string& label = "curve");
     void add_curve_3d(const std::vector<Point3d>& points,
                       const std::string& label = "curve");
+    void add_vectors_3d(const std::vector<Point3d>& origins,
+                        const std::vector<Point3d>& vectors,
+                        double length = 0.25,
+                        const std::string& label = "vectors");
     void add_control_polygon(const std::vector<Point2d>& points,
                              const std::string& label = "control polygon");
+    void add_vectors_2d(const std::vector<Point2d>& origins,
+                        const std::vector<Point2d>& vectors,
+                        double scale = 0.25,
+                        const std::string& label = "vectors");
     void add_surface(const surface::SurfaceSampleGrid<Point3d>& grid,
                      const std::string& label = "surface");
     void add_wireframe(const surface::SurfaceSampleGrid<Point3d>& grid);

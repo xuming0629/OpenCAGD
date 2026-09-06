@@ -1,12 +1,16 @@
 #pragma once
 
+#include <algorithm>    // std::max
+#include <cmath>        // std::pow, std::sqrt
 #include <cstddef>      // std::size_t
 #include <stdexcept>    // std::invalid_argument
 #include <utility>      // std::move
 #include <vector>       // std::vector
 
 #include <opencagd/curve/bspline_basis.hpp>
+#include <opencagd/curve/bspline_derivatives.hpp>
 #include <opencagd/geometry/point.hpp>
+#include <opencagd/math/numeric.hpp>
 
 namespace opencagd::curve
 {
@@ -289,6 +293,116 @@ public:
         }
 
         return point;
+    }
+
+    /**
+     * @brief 计算 B-spline 曲线从 0 阶到指定阶数的导数。
+     *
+     * 对于：
+     *
+     *      C(u) = Σ N_{i,p}(u) P_i
+     *
+     * 有：
+     *
+     *      C^(k)(u) = Σ N_{i,p}^(k)(u) P_i
+     *
+     * 返回数组：
+     *
+     *      result[0] = C(u)
+     *      result[1] = C'(u)
+     *      result[2] = C''(u)
+     *      ...
+     *
+     * @param u 曲线参数
+     * @param derivative_order 最高导数阶数
+     */
+    [[nodiscard]]
+    std::vector<point_type> derivatives(
+        double u,
+        std::size_t derivative_order) const
+    {
+        const std::size_t span = knot_vector_.find_span(u);
+        const auto ders = basis_function_derivatives(
+            knot_vector_,
+            span,
+            u,
+            derivative_order);
+
+        const std::size_t first = span - degree();
+
+        std::vector<point_type> result(
+            derivative_order + 1,
+            point_type{});
+
+        for (std::size_t k = 0; k <= derivative_order; ++k)
+        {
+            for (std::size_t j = 0; j <= degree(); ++j)
+            {
+                result[k] +=
+                    control_points_[first + j] * ders[k][j];
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * @brief 计算指定阶 B-spline 曲线导数。
+     */
+    [[nodiscard]]
+    point_type derivative(
+        double u,
+        std::size_t order = 1) const
+    {
+        return derivatives(u, order)[order];
+    }
+
+    /**
+     * @brief 计算单位切向量 T(u)。
+     *
+     *      T(u) = C'(u) / ||C'(u)||
+     */
+    [[nodiscard]]
+    point_type tangent(double u) const
+    {
+        const point_type d1 = derivative(u, 1);
+        const double speed = d1.norm();
+
+        if (speed <= math::default_tolerance)
+        {
+            throw std::runtime_error(
+                "B-spline tangent is undefined because the first derivative is zero");
+        }
+
+        return d1 / speed;
+    }
+
+    /**
+     * @brief 计算曲率。
+     *
+     * 使用适用于二维和三维曲线的 Gram determinant 形式：
+     *
+     *      κ = sqrt(||C'||² ||C''||² - (C'·C'')²) / ||C'||³
+     */
+    [[nodiscard]]
+    double curvature(double u) const
+    {
+        const auto ders = derivatives(u, 2);
+        const point_type& d1 = ders[1];
+        const point_type& d2 = ders[2];
+
+        const double speed2 = dot(d1, d1);
+        if (speed2 <= math::default_tolerance * math::default_tolerance)
+        {
+            throw std::runtime_error(
+                "B-spline curvature is undefined because the first derivative is zero");
+        }
+
+        const double gram = std::max(
+            0.0,
+            speed2 * dot(d2, d2) - dot(d1, d2) * dot(d1, d2));
+
+        return std::sqrt(gram) / std::pow(speed2, 1.5);
     }
 
 private:

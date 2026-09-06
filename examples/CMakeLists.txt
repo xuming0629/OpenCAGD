@@ -124,6 +124,11 @@ if(TARGET OpenCAGD::Plotting)
         visualization/01_curve/03_nurbs_quarter_circle.cpp
     )
 
+    opencagd_add_plotting_example(
+        opencagd_nurbs_tangents
+        visualization/01_curve/04_nurbs_tangents.cpp
+    )
+
 
     # --------------------------------------------------------
     # 02.3 Surface visualization examples
@@ -147,6 +152,11 @@ if(TARGET OpenCAGD::Plotting)
     opencagd_add_plotting_example(
         opencagd_nurbs_quarter_cylinder
         visualization/02_surface/13_nurbs_quarter_cylinder.cpp
+    )
+
+    opencagd_add_plotting_example(
+        opencagd_nurbs_surface_normals
+        visualization/02_surface/14_nurbs_surface_normals.cpp
     )
 
 else()

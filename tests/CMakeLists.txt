@@ -31,6 +31,7 @@ add_executable(
     curve/test_bezier.cpp
     curve/test_bspline.cpp
     curve/test_nurbs.cpp
+    surface/test_differential_geometry.cpp
 )
 
 target_link_libraries(

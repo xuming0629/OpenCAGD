@@ -1,13 +1,17 @@
 #pragma once
 
-#include <cmath>        // std::abs
+#include <algorithm>    // std::max
+#include <cmath>        // std::abs, std::pow, std::sqrt
 #include <cstddef>      // std::size_t
 #include <stdexcept>    // std::invalid_argument, std::runtime_error
 #include <utility>      // std::move
 #include <vector>       // std::vector
 
 #include <opencagd/curve/bspline_basis.hpp>
+#include <opencagd/curve/bspline_derivatives.hpp>
 #include <opencagd/geometry/point.hpp>
+#include <opencagd/math/binomial.hpp>
+#include <opencagd/math/numeric.hpp>
 
 namespace opencagd::curve
 {
@@ -480,6 +484,147 @@ public:
         //            denominator
         // -----------------------------------------------------
         return numerator / denominator;
+    }
+
+    /**
+     * @brief 计算 NURBS 曲线从 0 阶到指定阶数的导数。
+     *
+     * 先把 NURBS 写成齐次分子 / 权函数：
+     *
+     *      C(u) = A(u) / W(u)
+     *
+     * 其中：
+     *
+     *      A(u) = Σ N_i,p(u) w_i P_i
+     *      W(u) = Σ N_i,p(u) w_i
+     *
+     * 根据乘积求导：
+     *
+     *      A^(k) = Σ C(k,i) W^(i) C^(k-i)
+     *
+     * 可递推得到有理曲线各阶导数。
+     */
+    [[nodiscard]]
+    std::vector<point_type> derivatives(
+        double u,
+        std::size_t derivative_order) const
+    {
+        const std::size_t span = knot_vector_.find_span(u);
+        const auto basis_ders = basis_function_derivatives(
+            knot_vector_,
+            span,
+            u,
+            derivative_order);
+
+        const std::size_t first = span - degree();
+
+        // A^(k)：加权控制点分子的导数。
+        std::vector<point_type> A(
+            derivative_order + 1,
+            point_type{});
+
+        // W^(k)：权函数导数。
+        std::vector<double> W(
+            derivative_order + 1,
+            0.0);
+
+        for (std::size_t k = 0; k <= derivative_order; ++k)
+        {
+            for (std::size_t j = 0; j <= degree(); ++j)
+            {
+                const std::size_t index = first + j;
+                const double factor =
+                    basis_ders[k][j] * weights_[index];
+
+                A[k] += control_points_[index] * factor;
+                W[k] += factor;
+            }
+        }
+
+        if (std::abs(W[0]) <= math::default_tolerance)
+        {
+            throw std::runtime_error(
+                "NURBS derivative denominator is numerically zero");
+        }
+
+        std::vector<point_type> result(
+            derivative_order + 1,
+            point_type{});
+
+        // 0 阶就是曲线点。
+        result[0] = A[0] / W[0];
+
+        for (std::size_t k = 1; k <= derivative_order; ++k)
+        {
+            point_type value = A[k];
+
+            for (std::size_t i = 1; i <= k; ++i)
+            {
+                value -=
+                    result[k - i] *
+                    (static_cast<double>(math::binomial(k, i)) * W[i]);
+            }
+
+            result[k] = value / W[0];
+        }
+
+        return result;
+    }
+
+    /**
+     * @brief 计算指定阶 NURBS 曲线导数。
+     */
+    [[nodiscard]]
+    point_type derivative(
+        double u,
+        std::size_t order = 1) const
+    {
+        return derivatives(u, order)[order];
+    }
+
+    /**
+     * @brief 计算单位切向量。
+     */
+    [[nodiscard]]
+    point_type tangent(double u) const
+    {
+        const point_type d1 = derivative(u, 1);
+        const double speed = d1.norm();
+
+        if (speed <= math::default_tolerance)
+        {
+            throw std::runtime_error(
+                "NURBS tangent is undefined because the first derivative is zero");
+        }
+
+        return d1 / speed;
+    }
+
+    /**
+     * @brief 计算 NURBS 曲率。
+     *
+     *      κ = sqrt(||C'||² ||C''||² - (C'·C'')²) / ||C'||³
+     */
+    [[nodiscard]]
+    double curvature(double u) const
+    {
+        const auto ders = derivatives(u, 2);
+        const point_type& d1 = ders[1];
+        const point_type& d2 = ders[2];
+
+        const double speed2 = dot(d1, d1);
+        if (speed2 <= math::default_tolerance * math::default_tolerance)
+        {
+            throw std::runtime_error(
+                "NURBS curvature is undefined because the first derivative is zero");
+        }
+
+        const double d12 = dot(d1, d2);
+        const double gram = std::max(
+            0.0,
+            speed2 * dot(d2, d2) - d12 * d12);
+
+        return std::sqrt(gram) / std::pow(speed2, 1.5);
     }
 
 private:

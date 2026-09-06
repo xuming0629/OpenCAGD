@@ -17,3 +17,14 @@ opencagd_add_learning_example(opencagd_ch03_bspline_curve ch03_bspline/02_bsplin
 
 opencagd_add_learning_example(opencagd_ch04_nurbs_circle ch04_nurbs/00_quarter_circle.cpp)
 opencagd_add_learning_example(opencagd_ch04_rational_basis ch04_nurbs/01_rational_basis.cpp)
+
+# B-spline derivatives / differential geometry
+opencagd_add_learning_example(opencagd_ch03_basis_derivatives ch03_bspline/03_basis_derivatives.cpp)
+opencagd_add_learning_example(opencagd_ch03_curve_derivatives ch03_bspline/04_curve_derivatives.cpp)
+
+# Rational derivatives
+opencagd_add_learning_example(opencagd_ch04_nurbs_derivatives ch04_nurbs/02_curve_derivatives.cpp)
+
+# Tensor-product surface differential geometry
+opencagd_add_learning_example(opencagd_ch05_surface_derivatives ch05_surfaces/00_surface_derivatives.cpp)
+opencagd_add_learning_example(opencagd_ch05_nurbs_cylinder_geometry ch05_surfaces/01_nurbs_cylinder_geometry.cpp)
