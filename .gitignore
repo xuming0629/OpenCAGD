@@ -1,26 +1,47 @@
+# ============================================================
 # Build output
+# ============================================================
 /build/
 /cmake-build-*/
+build-*/
+cmake-build-*/
 
+# ============================================================
 # CMake local/user files
+# ============================================================
 CMakeUserPresets.json
 
+# ============================================================
 # Compiled objects / libraries
+# ============================================================
 *.o
 *.obj
 *.a
 *.so
+*.so.*
 *.dylib
 *.dll
 *.exe
 
-# Editor / OS noise
+# ============================================================
+# Editor / OS
+# ============================================================
 .DS_Store
+**/.DS_Store
 .idea/
 
-# Keep repository VS Code configuration
+# ============================================================
+# VS Code
+# ============================================================
 !.vscode/
 !.vscode/*.json
 
-# Vendored third-party runtime packages are intentionally versioned.
-!third_party/**
+# ============================================================
+# Third-party
+# ============================================================
+
+# Eigen is vendored with the project
+!third_party/eigen-5.0/**
+
+# VTK is a local dependency, not part of the repository
+third_party/vtk-9.4/
