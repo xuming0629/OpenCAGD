@@ -44,4 +44,7 @@ CMakeUserPresets.json
 !third_party/eigen-5.0/**
 
 # VTK is a local dependency, not part of the repository
-third_party/vtk-9.4/
+third_party/vtk-9.4/*
+third_party/*
+third_party/openmpi
+third_party/googletest
