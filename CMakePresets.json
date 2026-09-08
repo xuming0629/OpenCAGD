@@ -2,68 +2,237 @@
   "version": 3,
   "cmakeMinimumRequired": {
     "major": 3,
-    "minor": 20,
+    "minor": 21,
     "patch": 0
   },
   "configurePresets": [
     {
-      "name": "debug",
-      "displayName": "OpenCAGD Debug (Mac learning)",
-      "description": "C++20 Debug build with bundled MPI/GTest and optional active-Python Matplotlib",
+      "name": "common",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "OPENCAGD_BUILD_EXAMPLES": "ON",
+        "OPENCAGD_BUILD_TESTS": "ON",
+        "OPENCAGD_ENABLE_EIGEN": "ON"
+      }
+    },
+    {
+      "name": "unix",
+      "hidden": true,
+      "inherits": "common",
       "generator": "Unix Makefiles",
+      "condition": {
+        "type": "notEquals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "debug",
+      "inherits": "unix",
+      "displayName": "OpenCAGD C++14 Debug",
       "binaryDir": "${sourceDir}/build/debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "OPENCAGD_BUILD_EXAMPLES": "ON",
-        "OPENCAGD_BUILD_TESTS": "ON",
-        "OPENCAGD_ENABLE_MPI": "ON",
-        "OPENCAGD_ENABLE_PYTHON_PLOTTING": "ON",
-        "OPENCAGD_USE_BUNDLED_DEPS": "ON",
-        "CMAKE_OSX_ARCHITECTURES": "arm64"
+        "BUILD_SHARED_LIBS": "OFF",
+        "OPENCAGD_ENABLE_PLOT": "OFF",
+        "OPENCAGD_ENABLE_VTK": "OFF",
+        "OPENCAGD_ENABLE_MPI": "OFF"
       }
     },
     {
-      "name": "release",
-      "displayName": "OpenCAGD Release (Mac)",
-      "generator": "Unix Makefiles",
-      "binaryDir": "${sourceDir}/build/release",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "OPENCAGD_BUILD_EXAMPLES": "ON",
-        "OPENCAGD_BUILD_TESTS": "ON",
-        "OPENCAGD_ENABLE_MPI": "ON",
-        "OPENCAGD_ENABLE_PYTHON_PLOTTING": "ON",
-        "OPENCAGD_USE_BUNDLED_DEPS": "ON",
-        "CMAKE_OSX_ARCHITECTURES": "arm64"
-      }
-    },
-    {
-      "name": "core-debug",
-      "displayName": "OpenCAGD Core Debug (portable)",
-      "description": "Portable learning build without MPI or bundled binary dependencies",
-      "generator": "Unix Makefiles",
-      "binaryDir": "${sourceDir}/build/core-debug",
+      "name": "debug-plot",
+      "inherits": "unix",
+      "displayName": "OpenCAGD C++14 Debug + Matplotlib",
+      "binaryDir": "${sourceDir}/build/debug-plot",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "OPENCAGD_BUILD_EXAMPLES": "ON",
-        "OPENCAGD_BUILD_TESTS": "ON",
-        "OPENCAGD_ENABLE_MPI": "OFF",
-        "OPENCAGD_ENABLE_PYTHON_PLOTTING": "ON",
-        "OPENCAGD_USE_BUNDLED_DEPS": "OFF"
+        "BUILD_SHARED_LIBS": "OFF",
+        "OPENCAGD_ENABLE_PLOT": "ON",
+        "OPENCAGD_ENABLE_VTK": "OFF",
+        "OPENCAGD_ENABLE_MPI": "OFF"
+      }
+    },
+    {
+      "name": "debug-vtk",
+      "inherits": "unix",
+      "displayName": "OpenCAGD C++14 Debug + VTK",
+      "binaryDir": "${sourceDir}/build/debug-vtk",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_SHARED_LIBS": "OFF",
+        "OPENCAGD_ENABLE_PLOT": "OFF",
+        "OPENCAGD_ENABLE_VTK": "ON",
+        "OPENCAGD_ENABLE_MPI": "OFF"
+      }
+    },
+    {
+      "name": "debug-all",
+      "inherits": "unix",
+      "displayName": "OpenCAGD Debug + Eigen + Plot + VTK + MPI",
+      "binaryDir": "${sourceDir}/build/debug-all",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_SHARED_LIBS": "OFF",
+        "OPENCAGD_ENABLE_PLOT": "ON",
+        "OPENCAGD_ENABLE_VTK": "ON",
+        "OPENCAGD_ENABLE_MPI": "ON"
+      }
+    },
+    {
+      "name": "release-shared",
+      "inherits": "unix",
+      "displayName": "OpenCAGD C++14 Release Shared",
+      "binaryDir": "${sourceDir}/build/release-shared",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_SHARED_LIBS": "ON",
+        "OPENCAGD_ENABLE_PLOT": "OFF",
+        "OPENCAGD_ENABLE_VTK": "OFF",
+        "OPENCAGD_ENABLE_MPI": "OFF"
+      }
+    },
+    {
+      "name": "msvc",
+      "hidden": true,
+      "inherits": "common",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "cacheVariables": {
+        "OPENCAGD_USE_BUNDLED_BINARY_DEPS": "OFF"
+      }
+    },
+    {
+      "name": "msvc-debug",
+      "inherits": "msvc",
+      "displayName": "OpenCAGD MSVC Debug",
+      "binaryDir": "${sourceDir}/build/msvc-debug",
+      "cacheVariables": {
+        "BUILD_SHARED_LIBS": "OFF",
+        "OPENCAGD_ENABLE_PLOT": "OFF",
+        "OPENCAGD_ENABLE_VTK": "OFF",
+        "OPENCAGD_ENABLE_MPI": "OFF"
+      }
+    },
+    {
+      "name": "msvc-debug-plot",
+      "inherits": "msvc",
+      "displayName": "OpenCAGD MSVC Debug + Matplotlib",
+      "binaryDir": "${sourceDir}/build/msvc-debug-plot",
+      "cacheVariables": {
+        "BUILD_SHARED_LIBS": "OFF",
+        "OPENCAGD_ENABLE_PLOT": "ON",
+        "OPENCAGD_ENABLE_VTK": "OFF",
+        "OPENCAGD_ENABLE_MPI": "OFF"
+      }
+    },
+    {
+      "name": "msvc-debug-vtk",
+      "inherits": "msvc",
+      "displayName": "OpenCAGD MSVC Debug + VTK",
+      "binaryDir": "${sourceDir}/build/msvc-debug-vtk",
+      "cacheVariables": {
+        "BUILD_SHARED_LIBS": "OFF",
+        "OPENCAGD_ENABLE_PLOT": "OFF",
+        "OPENCAGD_ENABLE_VTK": "ON",
+        "OPENCAGD_ENABLE_MPI": "OFF"
       }
     }
   ],
   "buildPresets": [
-    {"name": "debug", "configurePreset": "debug"},
-    {"name": "release", "configurePreset": "release"},
-    {"name": "core-debug", "configurePreset": "core-debug"}
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    },
+    {
+      "name": "debug-plot",
+      "configurePreset": "debug-plot"
+    },
+    {
+      "name": "debug-vtk",
+      "configurePreset": "debug-vtk"
+    },
+    {
+      "name": "debug-all",
+      "configurePreset": "debug-all"
+    },
+    {
+      "name": "release-shared",
+      "configurePreset": "release-shared"
+    },
+    {
+      "name": "msvc-debug",
+      "configurePreset": "msvc-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "msvc-debug-plot",
+      "configurePreset": "msvc-debug-plot",
+      "configuration": "Debug"
+    },
+    {
+      "name": "msvc-debug-vtk",
+      "configurePreset": "msvc-debug-vtk",
+      "configuration": "Debug"
+    }
   ],
   "testPresets": [
-    {"name": "debug", "configurePreset": "debug", "output": {"outputOnFailure": true}},
-    {"name": "release", "configurePreset": "release", "output": {"outputOnFailure": true}},
-    {"name": "core-debug", "configurePreset": "core-debug", "output": {"outputOnFailure": true}}
+    {
+      "name": "debug",
+      "configurePreset": "debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "debug-plot",
+      "configurePreset": "debug-plot",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "msvc-debug",
+      "configurePreset": "msvc-debug",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "debug-vtk",
+      "configurePreset": "debug-vtk",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "debug-all",
+      "configurePreset": "debug-all",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "msvc-debug-plot",
+      "configurePreset": "msvc-debug-plot",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "msvc-debug-vtk",
+      "configurePreset": "msvc-debug-vtk",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
   ]
 }

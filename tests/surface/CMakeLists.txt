@@ -1,0 +1,2 @@
+opencagd_add_gtest(opencagd_test_surface test_surface.cpp surface)
+target_link_libraries(opencagd_test_surface PRIVATE OpenCAGD::Surface)

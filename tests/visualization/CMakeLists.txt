@@ -1,0 +1,2 @@
+opencagd_add_gtest(opencagd_test_visualization test_visualization.cpp visualization)
+target_link_libraries(opencagd_test_visualization PRIVATE OpenCAGD::Visualization)

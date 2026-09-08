@@ -1,0 +1,2 @@
+opencagd_add_gtest(opencagd_test_linalg test_linalg.cpp linalg)
+target_link_libraries(opencagd_test_linalg PRIVATE OpenCAGD::LinearAlgebra)

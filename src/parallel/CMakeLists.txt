@@ -1,0 +1,3 @@
+add_library(opencagd_parallel mpi_environment.cpp)
+target_link_libraries(opencagd_parallel PUBLIC opencagd_core MPI::MPI_CXX)
+opencagd_apply_library_defaults(opencagd_parallel OPENCAGD_PARALLEL_EXPORTS Parallel)

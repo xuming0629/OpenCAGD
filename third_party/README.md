@@ -1,17 +1,8 @@
-# Third-party dependencies
+# third_party
 
-This repository currently carries prebuilt **macOS Apple-Silicon (arm64)**
-dependencies used by the local OpenCAGD development environment:
+The C++14 core does not vendor mandatory third-party dependencies.
 
-- `googletest/` — GoogleTest 1.18.0 installed package
-- `openmpi/` — Open MPI 5.0.10 installed package
+Optional modules use system/toolchain packages:
 
-They are consumed by CMake through `OPENCAGD_USE_BUNDLED_DEPS=ON`.
-
-For Linux or Windows, configure with:
-
-```bash
-cmake -S . -B build -DOPENCAGD_USE_BUNDLED_DEPS=OFF
-```
-
-and provide native system MPI and GoogleTest packages.
+- Visualization: Python3 Development + Matplotlib at runtime.
+- Parallel: MPI C++ implementation discoverable by CMake.

@@ -1,0 +1,4 @@
+opencagd_add_example(opencagd_linalg_linear_system 00_linear_system.cpp linalg)
+target_link_libraries(opencagd_linalg_linear_system PRIVATE OpenCAGD::LinearAlgebra)
+opencagd_add_example(opencagd_linalg_least_squares 01_least_squares.cpp linalg)
+target_link_libraries(opencagd_linalg_least_squares PRIVATE OpenCAGD::LinearAlgebra)

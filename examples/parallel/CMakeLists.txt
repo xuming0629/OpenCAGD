@@ -1,0 +1,4 @@
+opencagd_add_example(opencagd_parallel_mpi_hello 00_mpi_hello.cpp parallel)
+target_link_libraries(opencagd_parallel_mpi_hello PRIVATE OpenCAGD::Parallel)
+opencagd_add_example(opencagd_parallel_mpi_reduce 01_mpi_reduce.cpp parallel)
+target_link_libraries(opencagd_parallel_mpi_reduce PRIVATE OpenCAGD::Parallel)

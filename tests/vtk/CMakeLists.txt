@@ -1,0 +1,5 @@
+opencagd_add_gtest(opencagd_test_vtk test_vtk.cpp vtk)
+target_link_libraries(opencagd_test_vtk PRIVATE OpenCAGD::VTK)
+if(COMMAND vtk_module_autoinit)
+    vtk_module_autoinit(TARGETS opencagd_test_vtk MODULES ${VTK_LIBRARIES})
+endif()

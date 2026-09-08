@@ -1,112 +1,34 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.16)
 
-# ============================================================
-# Version
-# VERSION is the single source of truth for OpenCAGD.
-# ============================================================
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" OPENCAGD_VERSION_FILE)
 string(STRIP "${OPENCAGD_VERSION_FILE}" OPENCAGD_VERSION)
 
-project(
-    OpenCAGD
+project(OpenCAGD
     VERSION ${OPENCAGD_VERSION}
-    DESCRIPTION "A modern C++20 learning and research library for CAGD, B-Spline and NURBS"
-    LANGUAGES CXX
-)
+    DESCRIPTION "Portable C++14 CAGD, B-Spline and NURBS learning library"
+    LANGUAGES CXX)
 
-message(STATUS "OpenCAGD version: ${PROJECT_VERSION}")
-
-# ============================================================
-# Global build settings
-# ============================================================
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
-if(APPLE)
-    set(_opencagd_default_bundled_deps ON)
-    set(_opencagd_default_mpi ON)
-else()
-    set(_opencagd_default_bundled_deps OFF)
-    set(_opencagd_default_mpi OFF)
-endif()
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(OpenCAGDOptions)
+include(OpenCAGDHelpers)
+include(OpenCAGDDependencies)
 
-option(OPENCAGD_BUILD_EXAMPLES "Build OpenCAGD examples" ON)
-option(OPENCAGD_BUILD_TESTS "Build OpenCAGD tests" ON)
-option(OPENCAGD_ENABLE_MPI "Enable optional MPI layer/examples/tests" ${_opencagd_default_mpi})
-option(OPENCAGD_ENABLE_PYTHON_PLOTTING "Enable embedded Python/Matplotlib plotting" ON)
-option(OPENCAGD_USE_BUNDLED_DEPS "Use compatible dependencies under third_party" ${_opencagd_default_bundled_deps})
+opencagd_configure_output_directories()
 
-set(
-    OPENCAGD_MPI_ROOT
-    "${CMAKE_CURRENT_SOURCE_DIR}/third_party/openmpi"
-    CACHE PATH
-    "Open MPI installation root"
-)
-
-set(
-    OPENCAGD_GTEST_ROOT
-    "${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest"
-    CACHE PATH
-    "GoogleTest installation root"
-)
-
-# ============================================================
-# Generated version header
-# ============================================================
 configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/config/version.hpp.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/generated/opencagd/core/version.hpp"
-    @ONLY
-)
+    "${CMAKE_CURRENT_SOURCE_DIR}/config/version.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/opencagd/core/version.h"
+    @ONLY)
 
-# ============================================================
-# Optional MPI dependency
-# Geometry / B-Spline / NURBS never depends on MPI.
-# ============================================================
-if(OPENCAGD_ENABLE_MPI)
-    add_library(opencagd_mpi INTERFACE)
-    add_library(OpenCAGD::MPI ALIAS opencagd_mpi)
-
-    if(OPENCAGD_USE_BUNDLED_DEPS)
-        if(NOT APPLE)
-            message(FATAL_ERROR
-                "The bundled Open MPI in this repository is a macOS Apple-Silicon build. "
-                "Use -DOPENCAGD_ENABLE_MPI=OFF or -DOPENCAGD_USE_BUNDLED_DEPS=OFF on this platform.")
-        endif()
-
-        if(NOT EXISTS "${OPENCAGD_MPI_ROOT}/include/mpi.h")
-            message(FATAL_ERROR "Bundled MPI header not found: ${OPENCAGD_MPI_ROOT}/include/mpi.h")
-        endif()
-
-        set(OPENCAGD_MPI_LIBRARY "${OPENCAGD_MPI_ROOT}/lib/libmpi.dylib")
-        if(NOT EXISTS "${OPENCAGD_MPI_LIBRARY}")
-            message(FATAL_ERROR "Bundled MPI library not found: ${OPENCAGD_MPI_LIBRARY}")
-        endif()
-
-        target_include_directories(opencagd_mpi SYSTEM INTERFACE "${OPENCAGD_MPI_ROOT}/include")
-        target_link_libraries(opencagd_mpi INTERFACE "${OPENCAGD_MPI_LIBRARY}")
-
-        set(OPENCAGD_MPIEXEC_EXECUTABLE "${OPENCAGD_MPI_ROOT}/bin/mpiexec")
-        set(OPENCAGD_MPIEXEC_NUMPROC_FLAG "-n")
-        message(STATUS "Using bundled Open MPI: ${OPENCAGD_MPI_ROOT}")
-    else()
-        find_package(MPI REQUIRED COMPONENTS CXX)
-        target_link_libraries(opencagd_mpi INTERFACE MPI::MPI_CXX)
-        set(OPENCAGD_MPIEXEC_EXECUTABLE "${MPIEXEC_EXECUTABLE}")
-        set(OPENCAGD_MPIEXEC_NUMPROC_FLAG "${MPIEXEC_NUMPROC_FLAG}")
-        message(STATUS "Using system MPI: ${MPI_CXX_VERSION}")
-    endif()
-endif()
-
-# ============================================================
-# Project modules
-# ============================================================
 add_subdirectory(src)
 
 if(OPENCAGD_BUILD_EXAMPLES)
@@ -115,5 +37,71 @@ endif()
 
 if(OPENCAGD_BUILD_TESTS)
     enable_testing()
+    include(CTest)
+
+    # OpenCAGD is intentionally C++14. GoogleTest 1.18+ requires C++17,
+    # therefore tests are pinned to the C++14-compatible 1.14 release line.
+    if(EXISTS "${OPENCAGD_THIRD_PARTY_DIR}/googletest/CMakeLists.txt")
+        set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+        set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+        add_subdirectory("${OPENCAGD_THIRD_PARTY_DIR}/googletest"
+                         "${CMAKE_BINARY_DIR}/third_party/googletest" EXCLUDE_FROM_ALL)
+    else()
+        if(EXISTS "${OPENCAGD_THIRD_PARTY_DIR}/googletest/lib/cmake/GTest/GTestConfig.cmake")
+            find_package(GTest 1.14 EXACT CONFIG QUIET
+                PATHS "${OPENCAGD_THIRD_PARTY_DIR}/googletest/lib/cmake/GTest"
+                NO_DEFAULT_PATH)
+        endif()
+
+        if(NOT TARGET GTest::gtest_main)
+            find_package(GTest 1.14 EXACT CONFIG QUIET)
+        endif()
+
+        if(NOT TARGET GTest::gtest_main)
+            if(OPENCAGD_FETCH_TEST_DEPS)
+                include(FetchContent)
+                FetchContent_Declare(googletest
+                    URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+                    DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+                if(MSVC)
+                    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+                endif()
+                set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+                set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+                FetchContent_MakeAvailable(googletest)
+            else()
+                message(FATAL_ERROR
+                    "GoogleTest 1.14 is required for the C++14 test suite. "
+                    "The previously bundled GoogleTest 1.18 requires C++17. "
+                    "Provide GoogleTest 1.14 or enable OPENCAGD_FETCH_TEST_DEPS.")
+            endif()
+        endif()
+    endif()
+
+    include(GoogleTest)
     add_subdirectory(tests)
 endif()
+
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/generated/opencagd"
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+install(EXPORT OpenCAGDTargets
+    FILE OpenCAGDTargets.cmake
+    NAMESPACE OpenCAGD::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/OpenCAGD)
+
+configure_package_config_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/OpenCAGDConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/OpenCAGDConfig.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/OpenCAGD)
+
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/OpenCAGDConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion)
+
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/OpenCAGDConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/OpenCAGDConfigVersion.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/OpenCAGD)

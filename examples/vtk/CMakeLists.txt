@@ -1,0 +1,6 @@
+opencagd_add_example(opencagd_vtk_renderer_demo renderer_demo.cpp vtk)
+target_link_libraries(opencagd_vtk_renderer_demo PRIVATE OpenCAGD::VTK OpenCAGD::Surface)
+target_compile_definitions(opencagd_vtk_renderer_demo PRIVATE OPENCAGD_EXAMPLE_SHOW=$<BOOL:${OPENCAGD_EXAMPLE_SHOW}> OPENCAGD_EXAMPLE_OUTPUT_DIR="${CMAKE_BINARY_DIR}/examples/output/vtk")
+if(COMMAND vtk_module_autoinit)
+    vtk_module_autoinit(TARGETS opencagd_vtk_renderer_demo MODULES ${VTK_LIBRARIES})
+endif()

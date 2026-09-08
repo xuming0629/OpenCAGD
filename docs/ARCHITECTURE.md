@@ -1,57 +1,66 @@
-# OpenCAGD Architecture
+# OpenCAGD architecture
 
-OpenCAGD keeps **library architecture** and **book-learning order** separate.
-
-## Core library
+OpenCAGD keeps mathematical geometry independent from presentation backends.
 
 ```text
-include/opencagd/
-├── core/           project/version facilities
-├── math/           numerical and polynomial helpers
-├── geometry/       Point and geometric primitives
-├── curve/          Bezier, B-Spline, NURBS
-├── surface/        future tensor-product surfaces
-├── algorithm/      future refinement/interpolation/intersection
-├── parallel/       optional MPI helpers
-└── visualization/  optional adapters
+Core
+  ├─ geometry primitives
+  └─ basic math
+       │
+       ├──────────────► Curve
+       │                 │
+       │                 └────► Surface
+       │                           │
+       └────► LinearAlgebra        │
+             (Eigen private)       ▼
+                            Visualization
+                            backend-neutral data
+                              │          │
+                              ▼          ▼
+                            Plot        VTK
+                         Matplotlib   VTK 9.4
+
+Core ───────────────────────────────► Parallel (MPI)
 ```
 
-Core dependency direction:
+## Dependency rule
+
+1. `Core`, `Curve`, `Surface` never include Python, Matplotlib, VTK, MPI, or Eigen headers in their public interfaces.
+2. `Visualization` contains only backend-neutral render data and the `Renderer` interface.
+3. `Plot` and `VTK` consume exactly the same `Visualization` data objects.
+4. `LinearAlgebra` uses Eigen only inside `.cpp` files; public APIs remain normal C++14 classes and `std::vector`.
+5. `Parallel` is optional and isolated.
+
+This makes adding another backend (OpenGL, Qt, WebGPU, etc.) a new library rather than a rewrite of geometry code.
+
+## Build tree
 
 ```text
-visualization     parallel
-      \             /
-       \           /
-        algorithm
-           |
-     curve / surface
-           |
-        geometry
-           |
-          math
-           |
-          core
+build/<preset>/
+├── lib/              # OpenCAGD libraries
+├── examples/         # example executables
+│   └── output/
+│       ├── plot/     # Matplotlib PNG output
+│       └── vtk/      # VTK PNG output
+├── tests/            # test executables
+└── third_party/      # build products such as GoogleTest
 ```
 
-`OpenCAGD::OpenCAGD` never depends on MPI or Python.
+## Renderer switching
 
-## Learning layer
+The geometry and scene data are identical:
 
-```text
-docs/book/             formula + geometric meaning + progress
-examples/book/         one minimal executable per concept
-examples/visualization visual verification
-tests/curve/           invariants and regression tests
+```cpp
+opencagd::visualization::Surface3DData data =
+    opencagd::visualization::make_surface_3d_data(grid, control_net);
+
+// Matplotlib
+opencagd::plot::MatplotlibRenderer plot;
+plot.render(data, options);
+
+// VTK
+opencagd::vtk::VTKRenderer vtk;
+vtk.render(data, options);
 ```
 
-A concept graduates into the library only when its mathematics and expected invariants are clear.
-
-## Build targets
-
-- `OpenCAGD::OpenCAGD`: core geometry/CAGD library;
-- `OpenCAGD::Plotting`: optional embedded CPython + Matplotlib adapter;
-- `OpenCAGD::MPI`: optional MPI dependency target.
-
-## Versioning
-
-`VERSION` remains the only manually edited project version. CMake generates `opencagd/core/version.hpp` in the build tree.
+No surface evaluation, sampling, normal calculation, or NURBS algorithm is duplicated in a renderer.

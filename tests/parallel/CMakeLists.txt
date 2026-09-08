@@ -1,0 +1,2 @@
+opencagd_add_gtest(opencagd_test_parallel test_parallel.cpp parallel)
+target_link_libraries(opencagd_test_parallel PRIVATE OpenCAGD::Parallel)

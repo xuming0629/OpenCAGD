@@ -1,0 +1,11 @@
+#pragma once
+#include <opencagd/curve/bernstein.h>
+#include <opencagd/curve/bezier_curve.h>
+#include <opencagd/curve/bezier_conversion.h>
+#include <opencagd/curve/bspline_basis.h>
+#include <opencagd/curve/bspline_curve.h>
+#include <opencagd/curve/knot_vector.h>
+#include <opencagd/curve/nurbs_curve.h>
+#include <opencagd/curve/parametric_curve.h>
+#include <opencagd/curve/polynomial_curve.h>
+#include <opencagd/curve/sampling.h>

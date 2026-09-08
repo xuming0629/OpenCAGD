@@ -1,0 +1,8 @@
+opencagd_add_example(opencagd_core_version 00_version.cpp core)
+target_link_libraries(opencagd_core_version PRIVATE OpenCAGD::Core)
+
+opencagd_add_example(opencagd_core_point_vector 01_point_vector.cpp core)
+target_link_libraries(opencagd_core_point_vector PRIVATE OpenCAGD::Core)
+
+opencagd_add_example(opencagd_core_power_basis 02_power_basis.cpp core)
+target_link_libraries(opencagd_core_power_basis PRIVATE OpenCAGD::Core)
